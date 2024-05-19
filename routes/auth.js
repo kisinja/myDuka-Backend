@@ -1,17 +1,14 @@
 const router = require("express").Router();
 const User = require("../models/User");
-const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 //REGISTER
 router.post("/register", async (req, res) => {
   const newUser = new User({
     username: req.body.username,
     email: req.body.email,
-    password: CryptoJS.AES.encrypt(
-      req.body.password,
-      process.env.PASS_SEC
-    ).toString(),
+    password: bcrypt.hashSync(req.body.password, 10),
   });
 
   try {
@@ -24,45 +21,26 @@ router.post("/register", async (req, res) => {
 
 //LOGIN
 
-router.post('/login', async (req, res) => {
-    try{
-        const user = await User.findOne(
-            {
-                userName: req.body.user_name
-            }
-        );
+router.post("/login", async (req, res) => {
+  try {
+    const user = await User.findOne({ username:req.body.username });
+    if (!user) {
+      return res.status(400).json("Wrong credentials");
+    } else {
+      const validPassword = bcrypt.compareSync(req.body.password, user.password);
+      if (!validPassword) {
+        return res.status(400).json("Wrong credentials");
+      } else {
+        const token = jwt.sign({ id: user.id, isAdmin: user.isAdmin }, "elvis", { expiresIn: "3d" });
 
-        !user && res.status(401).json("Wrong User Name");
-
-        const hashedPassword = CryptoJS.AES.decrypt(
-            user.password,
-            process.env.PASS_SEC
-        );
-
-
-        const originalPassword = hashedPassword.toString(CryptoJS.enc.Utf8);
-
-        const inputPassword = req.body.password;
-        
-        originalPassword != inputPassword && 
-            res.status(401).json("Wrong Password");
-
-        const accessToken = jwt.sign(
-        {
-            id: user._id,
-            isAdmin: user.isAdmin,
-        },
-        process.env.JWT_SEC,
-            {expiresIn:"3d"}
-        );
-  
-        const { password, ...others } = user._doc;  
-        res.status(200).json({...others, accessToken});
-
-    }catch(err){
-        res.status(500).json(err);
+        const { password, ...others } = user._doc;
+        return res.json({"token":token, "user":others}).status(200);
+      }
     }
-
-});
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).send("Server Error");
+  }
+})
 
 module.exports = router;
