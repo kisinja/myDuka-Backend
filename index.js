@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -10,8 +11,10 @@ const stripeRoute = require("./routes/stripe");
 const cors = require("cors");
 const morgan = require("morgan");
 
+const port = process.env.PORT || 5000;
+
 mongoose
-  .connect("mongodb://localhost:27017/myDuka")
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("DB Connection Successfull!"))
   .catch((err) => {
     console.log(err);
@@ -27,8 +30,8 @@ app.use("/api/carts", cartRoute);
 app.use("/api/orders", orderRoute);
 app.use("/api/checkout", stripeRoute);
 
-app.listen(5050, () => {
-  console.log("Backend server is running!");
+app.listen(port, () => {
+  console.log(`Backend server is running on port ${port}`);
 });
 
 app.get("/", (req, res) => {
