@@ -30,11 +30,11 @@ app.use("/api/carts", cartRoute);
 app.use("/api/orders", orderRoute);
 app.use("/api/checkout", stripeRoute);
 
-const Product = require("./models/Product");
-const products = require("./data");
+/* const Product = require("./models/Product");
+const products = require("./data"); */
 
 app.listen(port, async () => {
-  await Product.insertMany(products);
+  /* await Product.insertMany(products); */
   console.log(`Backend server is running on port ${port}`);
 });
 
