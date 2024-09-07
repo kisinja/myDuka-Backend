@@ -20,7 +20,12 @@ mongoose
     console.log(err);
   });
 
-app.use(cors());
+app.use(cors(
+  {
+    origins: ["http://localhost:5173", "https://myduka-client.onrender.com", "http://localhost:5174", "http://localhost:5175"],
+    credentials: true,
+  }
+));
 app.use(morgan("dev"));
 app.use(express.json());
 app.use("/api/auth", authRoute);
