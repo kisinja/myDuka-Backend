@@ -9,6 +9,7 @@ router.post("/register", async (req, res) => {
     username: req.body.username,
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, 10),
+    ...req.body
   });
 
   try {
@@ -23,7 +24,7 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const user = await User.findOne({ username:req.body.username });
+    const user = await User.findOne({ username: req.body.username });
     if (!user) {
       return res.status(400).json("Wrong credentials");
     } else {
@@ -31,10 +32,10 @@ router.post("/login", async (req, res) => {
       if (!validPassword) {
         return res.status(400).json("Wrong credentials");
       } else {
-        const token = jwt.sign({ id: user.id, isAdmin: user.isAdmin }, "elvis", { expiresIn: "3d" });
+        const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, "elvis", { expiresIn: "3d" });
 
         const { password, ...others } = user._doc;
-        return res.json({"token":token, "user":others}).status(200);
+        return res.json({ "token": token, "user": others }).status(200);
       }
     }
   } catch (error) {

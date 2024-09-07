@@ -9,8 +9,11 @@ const router = require("express").Router();
 
 //CREATE
 
-router.post("/", /* verifyToken, */ async (req, res) => {
-  const newOrder = new Order(req.body);
+router.post("/", verifyToken, async (req, res) => {
+  const newOrder = new Order({
+    userId: req.user._id,
+    ...req.body
+  });
 
   try {
     const savedOrder = await newOrder.save();

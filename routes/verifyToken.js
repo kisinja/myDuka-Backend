@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 const verifyToken = (req, res, next) => {
     const authHeader = req.header("Authorization");
@@ -8,7 +9,8 @@ const verifyToken = (req, res, next) => {
             if (err) {
                 return res.status(403).json("Token is not valid");
             } else {
-                req.user = user;
+                const currentUser = User.findById(user._id).select('-password');
+                req.user = currentUser;
                 next();
             }
         })
