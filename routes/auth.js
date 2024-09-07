@@ -6,10 +6,11 @@ const bcrypt = require("bcryptjs");
 //REGISTER
 router.post("/register", async (req, res) => {
   const newUser = new User({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
     username: req.body.username,
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, 10),
-    ...req.body
   });
 
   try {
