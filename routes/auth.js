@@ -18,6 +18,7 @@ router.post("/register", async (req, res) => {
     res.status(201).json(savedUser);
   } catch (err) {
     res.status(500).json(err);
+    console.log(err.message);
   }
 });
 
@@ -41,7 +42,7 @@ router.post("/login", async (req, res) => {
     }
   } catch (error) {
     console.error(error.message);
-    return res.status(500).send("Server Error");
+    return res.status(500).send(error.message);
   }
 })
 
